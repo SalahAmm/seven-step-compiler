@@ -8,17 +8,15 @@ import { M } from './Math'
  * falls back to a zero-looking character in Arabic UI fonts, so it is
  * rendered through KaTeX instead.
  */
-const TOKEN = /(∅)|(\d[\d.,]*\s*[–—-]\s*\d[\d.,]*)|(\d+\s*\/\s*\d+)/g
+const TOKEN_SOURCE = '(∅)|(\\d[\\d.,]*\\s*[–—-]\\s*\\d[\\d.,]*)|(\\d+\\s*\\/\\s*\\d+)'
 
 export function BidiText({ children }: { children?: ReactNode }) {
   if (typeof children !== 'string') return <>{children}</>
-  if (!TOKEN.test(children)) return <>{children}</>
-  TOKEN.lastIndex = 0
 
   const parts: ReactNode[] = []
   let cursor = 0
 
-  for (const match of children.matchAll(TOKEN)) {
+  for (const match of children.matchAll(new RegExp(TOKEN_SOURCE, 'g'))) {
     const start = match.index ?? 0
     if (start > cursor) parts.push(children.slice(cursor, start))
 
@@ -35,6 +33,7 @@ export function BidiText({ children }: { children?: ReactNode }) {
     cursor = start + match[0].length
   }
 
+  if (parts.length === 0) return <>{children}</>
   if (cursor < children.length) parts.push(children.slice(cursor))
   return <>{parts}</>
 }
