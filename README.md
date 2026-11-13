@@ -30,8 +30,11 @@ Arabic is route-scoped rather than a global toggle, so English pages always keep
 
 ## Mobile behaviour
 
-- A bottom stage dock on guide pages gives one-tap Previous / Contents / Next navigation.
-- Contents open in a focus-trapped sheet with Escape, scrim and close-button dismissal.
+- The top bar keeps one labelled **Course** button that opens the full course map as a focus-trapped drawer. The drawer is titled, closes on Escape, scrim or close button, returns focus to the button, and anchors to the right in Arabic.
+- A fixed stage dock on guide pages shows a seven-segment stage rail, Previous / Next, and a **Stage index** button. The rail marks the current and completed stages, and each segment jumps straight to its stage.
+- **Stage index** opens a sheet titled **This stage** with the sections of the current stage, a Deep notes list, and a **Full course map** link, so one stage never becomes a dead end.
+- The in-page stage table of contents is hidden on phones because the dock and sheet already cover that job; the desktop layout keeps it.
+- All mobile surfaces are focus-trapped and dismissible with Escape, the scrim or a close button.
 - Long formulas scroll horizontally inside their card instead of widening the page; numeric ranges and fractions are bidi-isolated so they never reverse in Arabic prose.
 - Touch targets, tables, code blocks and quiz controls are sized for a 320 px viewport and up.
 - A back-to-top control follows long pages without covering the stage dock.

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent, ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ArrowUp, Check, Globe2, Menu, Printer, X } from 'lucide-react'
@@ -201,6 +201,37 @@ function getNavGroups(isAr: boolean): NavGroup[] {
 function Sidebar({ open, onClose, isAr }: { open: boolean; onClose: () => void; isAr: boolean }) {
   const { isComplete, count, reset } = useProgress()
   const location = useLocation()
+  const panelRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const returnFocus = document.activeElement as HTMLElement | null
+    const focusTimer = window.setTimeout(() => {
+      panelRef.current?.querySelector<HTMLElement>('.sidebar-close')?.focus()
+    }, 40)
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab' || !panelRef.current) return
+      const focusable = panelRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.clearTimeout(focusTimer)
+      window.removeEventListener('keydown', onKey)
+      returnFocus?.focus?.()
+    }
+  }, [open])
 
   useEffect(() => {
     onClose()
@@ -217,12 +248,20 @@ function Sidebar({ open, onClose, isAr }: { open: boolean; onClose: () => void; 
   const groups = getNavGroups(isAr)
 
   return (
-    <aside className={`sidebar${open ? ' is-open' : ''}`} aria-label={isAr ? 'تنقل المقرر' : 'Course navigation'}>
+    <aside
+      className={`sidebar${open ? ' is-open' : ''}`}
+      aria-label={isAr ? 'تنقل المقرر' : 'Course navigation'}
+      id="course-menu"
+      ref={panelRef}
+      role={open ? 'dialog' : undefined}
+      aria-modal={open ? 'true' : undefined}
+    >
       <button type="button" className="icon-btn sidebar-close" onClick={onClose} aria-label={isAr ? 'إغلاق القائمة' : 'Close menu'}>
         <X size={19} />
       </button>
 
       <div className="sidebar-inner">
+        <div className="sidebar-kicker">{isAr ? 'خريطة المقرر' : 'Course map'}</div>
         <Link className="brand" to={isAr ? '/ar' : '/'} onClick={onClose}>
           <BrandMark className="brand-mark" />
           <span>
@@ -301,8 +340,16 @@ function MobileBar({ onOpen, open, isAr }: { onOpen: () => void; open: boolean; 
   const { pathname } = useLocation()
   return (
     <div className="mobile-bar">
-      <button type="button" className="icon-btn" onClick={onOpen} aria-label={isAr ? 'فتح قائمة المقرر' : 'Open course menu'} aria-expanded={open}>
-        <Menu size={20} />
+      <button
+        type="button"
+        className="mobile-menu-btn"
+        onClick={onOpen}
+        aria-label={isAr ? 'فتح خريطة المقرر' : 'Open course map'}
+        aria-expanded={open}
+        aria-controls="course-menu"
+      >
+        <Menu size={18} aria-hidden="true" />
+        <span>{isAr ? 'المقرر' : 'Course'}</span>
       </button>
       <Link className="mobile-brand" to={isAr ? '/ar' : '/'}>
         <BrandMark />

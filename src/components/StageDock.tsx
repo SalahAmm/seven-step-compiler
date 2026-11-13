@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowUp, ChevronLeft, ChevronRight, List, X } from 'lucide-react'
+import { ArrowUp, ChevronLeft, ChevronRight, List, Map, X } from 'lucide-react'
+import { useProgress } from '../context/ProgressContext'
 
 type DockLink = { to: string; label: string }
 
@@ -18,24 +19,28 @@ const labels = {
   en: {
     previous: 'Previous',
     next: 'Next',
-    contents: 'Contents',
-    sheetTitle: 'In this stage',
-    close: 'Close contents',
-    top: 'Top of stage',
+    contents: 'Stage index',
+    sheetTitle: 'This stage',
+    close: 'Close stage index',
+    top: 'Top of this stage',
     dives: 'Full notes',
     stageOf: (id: number) => `Stage ${id} of 7`,
     dock: 'Stage navigation',
+    stages: 'Jump to a stage',
+    courseMap: 'Full course map',
   },
   ar: {
     previous: 'السابق',
     next: 'التالي',
-    contents: 'المحتويات',
-    sheetTitle: 'محتويات المرحلة',
-    close: 'إغلاق المحتويات',
+    contents: 'فهرس المرحلة',
+    sheetTitle: 'هذه المرحلة',
+    close: 'إغلاق فهرس المرحلة',
     top: 'أعلى المرحلة',
     dives: 'الملاحظات الكاملة',
     stageOf: (id: number) => `المرحلة ${id} من 7`,
     dock: 'التنقل بين المراحل',
+    stages: 'الانتقال إلى مرحلة',
+    courseMap: 'خريطة المقرر كاملة',
   },
 }
 
@@ -52,8 +57,11 @@ export function StageDock({
   const sheetRef = useRef<HTMLDivElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
   const returnFocusRef = useRef<HTMLElement | null>(null)
+  const { isComplete } = useProgress()
   const t = labels[locale]
   const isRtl = locale === 'ar'
+  const stageBase = isRtl ? '/ar/stage' : '/guide'
+  const courseMapTo = isRtl ? '/ar' : '/'
   const PrevIcon = isRtl ? ChevronRight : ChevronLeft
   const NextIcon = isRtl ? ChevronLeft : ChevronRight
 
@@ -107,49 +115,70 @@ export function StageDock({
   return (
     <>
       <nav className="stage-dock" aria-label={t.dock} dir={isRtl ? 'rtl' : 'ltr'}>
-        {previous ? (
-          <Link className="stage-dock-link" to={previous.to}>
-            <PrevIcon size={18} aria-hidden="true" />
-            <span className="stage-dock-copy">
-              <small>{t.previous}</small>
-              <strong>{previous.label}</strong>
-            </span>
-          </Link>
-        ) : (
-          <span className="stage-dock-link is-disabled" aria-disabled="true">
-            <PrevIcon size={18} aria-hidden="true" />
-            <span className="stage-dock-copy"><small>{t.previous}</small></span>
-          </span>
-        )}
+        <div className="stage-dock-rail" role="group" aria-label={t.stages}>
+          {Array.from({ length: 7 }, (_, index) => {
+            const id = index + 1
+            const current = id === stageId
+            const complete = isComplete(`stage-${id}`)
+            return (
+              <Link
+                key={id}
+                to={`${stageBase}/${id}`}
+                className={`stage-rail-step${current ? ' is-current' : ''}${complete ? ' is-complete' : ''}`}
+                aria-current={current ? 'page' : undefined}
+                aria-label={t.stageOf(id)}
+              >
+                <span aria-hidden="true" />
+              </Link>
+            )
+          })}
+        </div>
 
-        <button
-          type="button"
-          className="stage-dock-contents"
-          onClick={() => setOpen(true)}
-          aria-expanded={open}
-          aria-haspopup="dialog"
-        >
-          <List size={17} aria-hidden="true" />
-          <span>
-            <strong>{t.contents}</strong>
-            <small dir="ltr">{stageId} / 7</small>
-          </span>
-        </button>
-
-        {next ? (
-          <Link className="stage-dock-link is-next" to={next.to}>
-            <span className="stage-dock-copy">
-              <small>{t.next}</small>
-              <strong>{next.label}</strong>
+        <div className="stage-dock-row">
+          {previous ? (
+            <Link className="stage-dock-link" to={previous.to}>
+              <PrevIcon size={18} aria-hidden="true" />
+              <span className="stage-dock-copy">
+                <small>{t.previous}</small>
+                <strong>{previous.label}</strong>
+              </span>
+            </Link>
+          ) : (
+            <span className="stage-dock-link is-disabled" aria-disabled="true">
+              <PrevIcon size={18} aria-hidden="true" />
+              <span className="stage-dock-copy"><small>{t.previous}</small></span>
             </span>
-            <NextIcon size={18} aria-hidden="true" />
-          </Link>
-        ) : (
-          <span className="stage-dock-link is-next is-disabled" aria-disabled="true">
-            <span className="stage-dock-copy"><small>{t.next}</small></span>
-            <NextIcon size={18} aria-hidden="true" />
-          </span>
-        )}
+          )}
+
+          <button
+            type="button"
+            className="stage-dock-contents"
+            onClick={() => setOpen(true)}
+            aria-expanded={open}
+            aria-haspopup="dialog"
+          >
+            <List size={17} aria-hidden="true" />
+            <span>
+              <strong>{t.contents}</strong>
+              <small dir="ltr">{stageId} / 7</small>
+            </span>
+          </button>
+
+          {next ? (
+            <Link className="stage-dock-link is-next" to={next.to}>
+              <span className="stage-dock-copy">
+                <small>{t.next}</small>
+                <strong>{next.label}</strong>
+              </span>
+              <NextIcon size={18} aria-hidden="true" />
+            </Link>
+          ) : (
+            <span className="stage-dock-link is-next is-disabled" aria-disabled="true">
+              <span className="stage-dock-copy"><small>{t.next}</small></span>
+              <NextIcon size={18} aria-hidden="true" />
+            </span>
+          )}
+        </div>
       </nav>
 
       {open ? (
@@ -209,6 +238,11 @@ export function StageDock({
                   ))}
                 </div>
               ) : null}
+
+              <Link className="sheet-map-link" to={courseMapTo} onClick={close}>
+                <Map size={17} aria-hidden="true" />
+                <span>{t.courseMap}</span>
+              </Link>
             </div>
           </div>
         </div>

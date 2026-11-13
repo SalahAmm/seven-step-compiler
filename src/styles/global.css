@@ -384,6 +384,10 @@ svg {
   display: none;
 }
 
+.sidebar-kicker {
+  display: none;
+}
+
 .scrim {
   display: none;
 }
@@ -1890,6 +1894,18 @@ svg {
     right: 14px;
   }
 
+  .sidebar-kicker {
+    display: block;
+    margin: 0 8px 10px;
+    padding-inline-end: 48px;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 620;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
   .scrim {
     display: block;
     position: fixed;
@@ -1924,17 +1940,38 @@ svg {
     position: sticky;
     top: 0;
     z-index: 30;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
     height: 60px;
     padding: 0 20px;
     background: color-mix(in srgb, var(--paper) 96%, transparent);
     backdrop-filter: blur(8px);
   }
 
+  .mobile-menu-btn {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 0 11px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--paper-raised);
+    color: var(--ink);
+    font-size: 0.74rem;
+    font-weight: 680;
+    cursor: pointer;
+  }
+
+  .mobile-menu-btn:hover {
+    background: var(--surface);
+  }
+
   .mobile-brand {
+    justify-self: center;
     display: flex;
     align-items: center;
     gap: 9px;
@@ -1942,6 +1979,11 @@ svg {
     font-family: var(--font-display);
     font-size: 1.02rem;
     letter-spacing: -0.02em;
+  }
+
+  .mobile-bar .mobile-actions {
+    justify-self: end;
+    margin-inline-start: 0;
   }
 
   .mobile-brand svg {
@@ -1961,6 +2003,11 @@ svg {
   .mobile-progress .progress-track {
     width: 54px;
     height: 5px;
+  }
+
+  /* The fixed stage dock owns in-stage navigation on phones. */
+  .lesson-head .toc-card {
+    display: none;
   }
 
   .page {
