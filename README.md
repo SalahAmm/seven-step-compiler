@@ -2,6 +2,8 @@
 
 A beginner-first study guide for the Compilation module (L3 Computer Science, Université Yahia Fares – Médéa). It is built to get a student with no CS background to a passing grade on the assessment, without hiding the exam-critical detail. The same core path is available in English and Arabic, and both editions are designed phone-first for sharing in class groups.
 
+**Read it online:** <https://salahamm.github.io/seven-step-compiler/> — every push to `master` deploys automatically through GitHub Pages.
+
 ## What is inside
 
 - **Seven stages** — regex and grep, automata, conversions, grammars and CNF, FIRST/FOLLOW, LL(1), and PDA/QCM.
